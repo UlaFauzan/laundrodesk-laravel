@@ -1,0 +1,173 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Pelanggan;
+use App\Models\User;
+use App\Models\Role;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+
+class AuthController extends Controller
+{
+    public function showLogin()
+    {
+        return view('auth.login');
+    }
+
+    public function login(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
+
+            $role = strtolower(auth()->user()->role?->nama_role ?? '');
+
+            // Hanya pelanggan yang perlu daftar dulu (punya pelanggan_id)
+            if ($role === 'pelanggan' && !auth()->user()->pelanggan_id) {
+                Auth::logout();
+                return redirect('/login')->with('message', 'Pelanggan harus daftar dahulu');
+            }
+
+
+
+            if ($role === 'admin') {
+                return redirect('/admin');
+            }
+
+            if ($role === 'kasir') {
+                return redirect('/transaksi');
+            }
+
+            if ($role === 'manager') {
+                return redirect('/laporan-pendapatan');
+            }
+
+            if ($role === 'pelanggan') {
+                return redirect('/pelanggan/profile');
+            }
+
+            Auth::logout();
+            return back()->withErrors([
+                'email' => 'Role akun Anda tidak dikenali.',
+            ])->withInput();
+        }
+
+        return back()->withErrors([
+            'email' => 'Email atau password salah.',
+        ])->withInput();
+    }
+
+    public function showRegister()
+    {
+        return view('auth.register');
+    }
+
+    public function register(Request $request)
+    {
+        // Karena form email pelanggan memakai prefix (email_prefix) dan email final dibentuk via JS,
+        // rule unique harus dihitung setelah email final terbentuk.
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'email_prefix' => 'nullable|string',
+            'password' => 'required|string|min:8|confirmed',
+            'telepon' => 'required|string|max:20',
+            'alamat' => 'required|string',
+        ]);
+
+        // Bentuk email final dari prefix + "@mail.com" (fallback ke email yang dikirim hidden).
+        $email = $validated['email'];
+        if (isset($request->email_prefix) && trim((string) $request->email_prefix) !== '') {
+            $email = trim((string) $request->email_prefix) . '@mail.com';
+        }
+
+        // Pastikan email final unique
+        $request->validate([
+            'email' => 'unique:users,email',
+        ], [
+            'email.unique' => 'email has already been taken',
+        ]);
+
+
+        $validated['email'] = $email;
+
+
+
+        // Pastikan pelanggan sudah memiliki transaksi sebelum bisa mendaftar
+        $pelanggan = Pelanggan::where('telepon', $validated['telepon'])
+            ->whereHas('transaksi')
+            ->first();
+
+        if (! $pelanggan) {
+            return back()->withErrors([
+                'telepon' => 'Anda belum melakukan transaksi sehingga tidak dapat mendaftar.',
+            ])->withInput();
+        }
+
+        if (User::where('pelanggan_id', $pelanggan->id)->exists()) {
+            return back()->withErrors([
+                'telepon' => 'Pelanggan ini sudah memiliki akun.',
+            ])->withInput();
+        }
+
+        // Get pelanggan role (id: 4)
+        $pelangganRole = Role::where('nama_role', 'pelanggan')->first();
+
+        $pelanggan->update([
+            'nama' => $validated['name'],
+            'alamat' => $validated['alamat'],
+        ]);
+
+        User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'role_id' => $pelangganRole?->id ?? 4,
+            'pelanggan_id' => $pelanggan->id,
+        ]);
+
+        if (Auth::attempt(['email' => $validated['email'], 'password' => $validated['password']])) {
+            $request->session()->regenerate();
+
+            // pastikan pelanggan hanya bisa akses jika role sudah benar
+            if (strtolower(auth()->user()->role?->nama_role ?? '') !== 'pelanggan') {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'Akun ini bukan pelanggan.',
+                ])->withInput();
+            }
+
+            return redirect()->intended('pelanggan/profile');
+        }
+
+
+        return redirect('/login');
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        
+        // Invalidate current session
+        $request->session()->invalidate();
+        
+        // Regenerate CSRF token for next session
+        $request->session()->regenerateToken();
+        
+        // Clear all cookies
+        session()->flush();
+        
+        // Return redirect with explicit cache headers to prevent "page expired" error
+        return redirect('/login')
+            ->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0')
+            ->with('message', 'Anda telah berhasil logout');
+    }
+}

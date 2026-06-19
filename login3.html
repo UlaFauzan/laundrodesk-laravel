@@ -1,0 +1,151 @@
+HTTP/1.1 200 OK
+Host: 127.0.0.1:8000
+Date: Thu, 18 Jun 2026 05:48:59 GMT
+Connection: close
+X-Powered-By: PHP/8.2.0
+Content-Type: text/html; charset=utf-8
+Cache-Control: no-cache, private
+Date: Thu, 18 Jun 2026 05:48:59 GMT
+Set-Cookie: XSRF-TOKEN=eyJpdiI6Ik9uZE4wVVNZSDQ2MW9Zb1FwSFVPQnc9PSIsInZhbHVlIjoibExpSEc2cVlrYjg5Ly9NWW1td21jcFRjK2hEbXFyVENidFkxSFdDTUduZFFYWkdaelZqS0ozUzJVV1h1MWZRVDhqRHdRRU5qNGd2d3J5eXBrUFFoOTVxcUtHWUwvcnNSY0RDeCtNSCtIZm9wSWVRUnAyaU9PRFUxYVZ0SDBkdy8iLCJtYWMiOiJmN2U2NGI1NGZjZWFkNjkzMGQ4MmRmNThjYWQ1MTlhNDYzOTEzNGQ5ZWIyODc4NTdhMTMwZjQzOGQxNTllZTBiIiwidGFnIjoiIn0%3D; expires=Thu, 18 Jun 2026 07:48:59 GMT; Max-Age=7200; path=/; samesite=lax
+Set-Cookie: laravel-session=eyJpdiI6Ik1rNkZQQjFKZ0ZOb1Rxc2pKc2lvQXc9PSIsInZhbHVlIjoiSUZuaW8yZ2s4bFFYd0F2YytDRjBiN3hqNHVWTlJRYWhEV3h2bVl1NUpRY25rZEdDMytnTjhwd3ZZSk1meWJGY2NzdXFrSThlWTE3VFcvZzVhVk0xV1FJKzdUOE5lcnF0TXRnSEJUY0xLOW1ybUpLbXErSXI5dFAwbEZoMTg5ZFoiLCJtYWMiOiJiMzYyYmVhY2FiYjRmMzk2ZWJhYmVlYzFmNWMxNDYyNWEzY2QyMTRiMmRhZGIyODExNGE3NDdlYjk0MGNkZTc2IiwidGFnIjoiIn0%3D; expires=Thu, 18 Jun 2026 07:48:59 GMT; Max-Age=7200; path=/; httponly; samesite=lax
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login - Laundry Management</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root{
+            --bg: #f6f5ff;
+            --card: rgba(255,255,255,.85);
+            --text: #1f1b2e;
+            --muted: #6b6790;
+            --primary: #7c3aed;
+            --border: rgba(124,58,237,.18);
+            --success: #22c55e;
+            --danger: #ef4444;
+        }
+
+        body { font-family: 'Merriweather', Georgia, 'Times New Roman', Times, serif; line-height: 1.6; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+        .container {
+            max-width: 430px;
+            margin: 90px auto;
+            background: var(--card);
+            padding: 26px;
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            box-shadow: 0 14px 40px rgba(124,58,237,.08);
+            backdrop-filter: blur(10px);
+        }
+
+        h1 { text-align: center; margin-bottom: 22px; color: var(--primary); font-size: 22px; font-weight: 900; }
+        .form-group { margin-bottom: 14px; }
+        label { display: block; margin-bottom: 6px; color: var(--muted); font-weight: 800; font-size: 13px; }
+        input {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid rgba(124,58,237,.18);
+            border-radius: 12px;
+            font-size: 14px;
+            background: rgba(255,255,255,.7);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: rgba(124,58,237,.45);
+            box-shadow: 0 0 0 4px rgba(124,58,237,.12);
+        }
+
+        button {
+            width: 100%;
+            padding: 11px 12px;
+            background: rgba(124,58,237,.12);
+            color: var(--primary);
+            border: 1px solid rgba(124,58,237,.25);
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 900;
+            cursor: pointer;
+            margin-top: 6px;
+        }
+        button:hover { background: rgba(124,58,237,.18); }
+
+        .link { text-align: center; margin-top: 14px; }
+        .link a { color: var(--primary); text-decoration: none; font-weight: 900; }
+        .error { color: #b91c1c; font-size: 14px; margin-top: 6px; font-weight: 800; }
+        .info {
+            background: rgba(167,139,250,.12);
+            color: var(--text);
+            border: 1px solid rgba(124,58,237,.25);
+            padding: 14px;
+            border-radius: 14px;
+            margin-bottom: 18px;
+            font-size: 13px;
+            line-height: 1.45;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Login</h1>
+
+        <div class="info">
+            <strong>Masuk untuk semua pengguna.</strong><br>
+            Admin, kasir, manager, dan pelanggan bisa menggunakan halaman ini.
+        </div>
+
+
+        
+        
+        <form method="POST" action="http://127.0.0.1:8000/login">
+            <input type="hidden" name="_token" value="VYxFuamSUECyfAnKMkcdTaifSnB4JXr1g4lLR6Rf" autocomplete="off">            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="text" id="email" name="email" required value="" placeholder="username">
+                <div style="font-size:12px; color:var(--muted); margin-top:6px;">Tidak perlu mengetik <strong>@mail.com</strong>; akan ditambahkan otomatis jika tidak ada domain.</div>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+
+        <script>
+            (function(){
+                const domain = '@mail.com';
+                const emailInput = document.getElementById('email');
+                const form = emailInput && emailInput.closest('form');
+
+                function normalizeEmail() {
+                    if (!emailInput) return;
+                    const val = emailInput.value.trim();
+                    if (!val) return;
+                    // if already contains @ with something after it, keep as-is
+                    if (val.indexOf('@') === -1) {
+                        emailInput.value = val + domain;
+                    }
+                }
+
+                if (emailInput) {
+                    emailInput.addEventListener('blur', normalizeEmail);
+                }
+
+                if (form) {
+                    form.addEventListener('submit', function(e){
+                        normalizeEmail();
+                    });
+                }
+            })();
+        </script>
+
+        <div class="link">
+            Belum punya akun? <a href="/register">Daftar di sini</a>
+        </div>
+    </div>
+</body>
+</html>
