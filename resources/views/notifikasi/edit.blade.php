@@ -1,43 +1,46 @@
-<h1>Edit Notifikasi</h1>
+@extends('layout')
 
-<form action="/notifikasi/{{ $notifikasi->id }}" method="POST">
-    @csrf
-    @method('PUT')
+@section('title', 'Edit Notifikasi')
 
-    <label>Pelanggan</label>
+@section('content')
+    <div class="page-header">
+        <div>
+            <h1>Edit Notifikasi</h1>
+            <p>Perbarui pesan dan status baca notifikasi pelanggan.</p>
+        </div>
+    </div>
 
-    <select name="pelanggan_id">
-        @foreach($pelanggan as $p)
-            <option value="{{ $p->id }}"
-            {{ $notifikasi->pelanggan_id == $p->id ? 'selected' : '' }}>
-                {{ $p->nama }}
-            </option>
-        @endforeach
-    </select>
+    <form class="form-card" action="/notifikasi/{{ $notifikasi->id }}" method="POST">
+        @csrf
+        @method('PUT')
 
-    <br><br>
+        <div class="field">
+            <label for="pelanggan_id">Pelanggan</label>
+            <select id="pelanggan_id" name="pelanggan_id">
+                @foreach($pelanggan as $p)
+                    <option value="{{ $p->id }}" {{ old('pelanggan_id', $notifikasi->pelanggan_id) == $p->id ? 'selected' : '' }}>
+                        {{ $p->nama }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
 
-    <label>Pesan</label>
+        <div class="field">
+            <label for="pesan">Pesan</label>
+            <textarea id="pesan" name="pesan">{{ old('pesan', $notifikasi->pesan) }}</textarea>
+        </div>
 
-    <textarea name="pesan">{{ $notifikasi->pesan }}</textarea>
+        <div class="field">
+            <label for="status_baca">Status</label>
+            <select id="status_baca" name="status_baca">
+                <option {{ old('status_baca', $notifikasi->status_baca) == 'Belum Dibaca' ? 'selected' : '' }}>Belum Dibaca</option>
+                <option {{ old('status_baca', $notifikasi->status_baca) == 'Sudah Dibaca' ? 'selected' : '' }}>Sudah Dibaca</option>
+            </select>
+        </div>
 
-    <br><br>
-
-    <label>Status</label>
-
-    <select name="status_baca">
-        <option {{ $notifikasi->status_baca == 'Belum Dibaca' ? 'selected' : '' }}>
-            Belum Dibaca
-        </option>
-
-        <option {{ $notifikasi->status_baca == 'Sudah Dibaca' ? 'selected' : '' }}>
-            Sudah Dibaca
-        </option>
-    </select>
-
-    <br><br>
-
-    <button type="submit">
-        Update
-    </button>
-</form>
+        <div class="actions">
+            <button type="submit" class="btn btn-primary">Update</button>
+            <a href="/notifikasi" class="btn btn-secondary">Kembali</a>
+        </div>
+    </form>
+@endsection

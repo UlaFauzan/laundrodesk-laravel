@@ -1,41 +1,56 @@
-<h1>Edit Detail Transaksi</h1>
+@extends('layout')
 
-<form action="/detail-transaksi/{{ $detail->id }}" method="POST">
+@section('title', 'Edit Detail Transaksi')
 
-    @csrf
-    @method('PUT')
+@section('content')
+    <div class="page-header">
+        <div>
+            <h1>Edit Detail Transaksi</h1>
+            <p>Perbarui layanan, berat, dan subtotal detail transaksi.</p>
+        </div>
+    </div>
 
-    <label>ID Transaksi</label>
-    <input type="number"
-           name="transaksi_id"
-           value="{{ $detail->transaksi_id }}">
+    <form class="form-card" action="/detail-transaksi/{{ $detailTransaksi->id }}" method="POST">
+        @csrf
+        @method('PUT')
 
-    <br><br>
+        <div class="form-grid">
+            <div class="field">
+                <label for="transaksi_id">Transaksi</label>
+                <select id="transaksi_id" name="transaksi_id">
+                    @foreach($transaksi as $t)
+                        <option value="{{ $t->id }}" {{ old('transaksi_id', $detailTransaksi->transaksi_id) == $t->id ? 'selected' : '' }}>
+                            #{{ $t->id }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
 
-    <label>ID Layanan</label>
-    <input type="number"
-           name="layanan_id"
-           value="{{ $detail->layanan_id }}">
+            <div class="field">
+                <label for="layanan_id">Layanan</label>
+                <select id="layanan_id" name="layanan_id">
+                    @foreach($layanan as $l)
+                        <option value="{{ $l->id }}" {{ old('layanan_id', $detailTransaksi->layanan_id) == $l->id ? 'selected' : '' }}>
+                            {{ $l->nama_layanan }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
 
-    <br><br>
+            <div class="field">
+                <label for="berat_kg">Berat (Kg)</label>
+                <input id="berat_kg" type="number" step="0.01" name="berat_kg" value="{{ old('berat_kg', $detailTransaksi->berat_kg) }}">
+            </div>
 
-    <label>Berat (Kg)</label>
-    <input type="number"
-           step="0.01"
-           name="berat_kg"
-           value="{{ $detail->berat_kg }}">
+            <div class="field">
+                <label for="subtotal">Subtotal</label>
+                <input id="subtotal" type="number" name="subtotal" value="{{ old('subtotal', $detailTransaksi->subtotal) }}">
+            </div>
+        </div>
 
-    <br><br>
-
-    <label>Subtotal</label>
-    <input type="number"
-           name="subtotal"
-           value="{{ $detail->subtotal }}">
-
-    <br><br>
-
-    <button type="submit">
-        Update
-    </button>
-
-</form>
+        <div class="actions">
+            <button type="submit" class="btn btn-primary">Update</button>
+            <a href="/detail-transaksi" class="btn btn-secondary">Kembali</a>
+        </div>
+    </form>
+@endsection

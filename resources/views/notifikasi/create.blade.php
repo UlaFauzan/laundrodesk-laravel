@@ -1,36 +1,45 @@
-<h1>Tambah Notifikasi</h1>
+@extends('layout')
 
-<form action="/notifikasi" method="POST">
-    @csrf
+@section('title', 'Tambah Notifikasi')
 
-    <label>Pelanggan</label>
+@section('content')
+    <div class="page-header">
+        <div>
+            <h1>Tambah Notifikasi</h1>
+            <p>Buat pesan baru untuk pelanggan.</p>
+        </div>
+    </div>
 
-    <select name="pelanggan_id">
-        @foreach($pelanggan as $p)
-            <option value="{{ $p->id }}">
-                {{ $p->nama }}
-            </option>
-        @endforeach
-    </select>
+    <form class="form-card" action="/notifikasi" method="POST">
+        @csrf
 
-    <br><br>
+        <div class="field">
+            <label for="pelanggan_id">Pelanggan</label>
+            <select id="pelanggan_id" name="pelanggan_id">
+                @foreach($pelanggan as $p)
+                    <option value="{{ $p->id }}" {{ old('pelanggan_id') == $p->id ? 'selected' : '' }}>
+                        {{ $p->nama }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
 
-    <label>Pesan</label>
+        <div class="field">
+            <label for="pesan">Pesan</label>
+            <textarea id="pesan" name="pesan">{{ old('pesan') }}</textarea>
+        </div>
 
-    <textarea name="pesan"></textarea>
+        <div class="field">
+            <label for="status_baca">Status</label>
+            <select id="status_baca" name="status_baca">
+                <option {{ old('status_baca') == 'Belum Dibaca' ? 'selected' : '' }}>Belum Dibaca</option>
+                <option {{ old('status_baca') == 'Sudah Dibaca' ? 'selected' : '' }}>Sudah Dibaca</option>
+            </select>
+        </div>
 
-    <br><br>
-
-    <label>Status</label>
-
-    <select name="status_baca">
-        <option>Belum Dibaca</option>
-        <option>Sudah Dibaca</option>
-    </select>
-
-    <br><br>
-
-    <button type="submit">
-        Simpan
-    </button>
-</form>
+        <div class="actions">
+            <button type="submit" class="btn btn-primary">Simpan</button>
+            <a href="/notifikasi" class="btn btn-secondary">Kembali</a>
+        </div>
+    </form>
+@endsection

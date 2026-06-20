@@ -87,17 +87,14 @@ class AuthController extends Controller
             $email = trim((string) $request->email_prefix) . '@mail.com';
         }
 
-        // Pastikan email final unique
-        $request->validate([
-            'email' => 'unique:users,email',
-        ], [
-            'email.unique' => 'email has already been taken',
-        ]);
-
-
         $validated['email'] = $email;
 
-
+        $existingUserByEmail = User::where('email', $validated['email'])->first();
+        if ($existingUserByEmail && strtolower($existingUserByEmail->role?->nama_role ?? '') !== 'pelanggan') {
+            return back()->withErrors([
+                'email' => 'Email sudah digunakan oleh akun non-pelanggan.',
+            ])->withInput();
+        }
 
         // Pastikan pelanggan sudah memiliki transaksi sebelum bisa mendaftar
         $pelanggan = Pelanggan::where('telepon', $validated['telepon'])
@@ -110,9 +107,16 @@ class AuthController extends Controller
             ])->withInput();
         }
 
-        if (User::where('pelanggan_id', $pelanggan->id)->exists()) {
+        if ($existingUserByEmail && $existingUserByEmail->pelanggan_id && $existingUserByEmail->pelanggan_id !== $pelanggan->id) {
             return back()->withErrors([
-                'telepon' => 'Pelanggan ini sudah memiliki akun.',
+                'email' => 'Email sudah digunakan oleh pelanggan lain.',
+            ])->withInput();
+        }
+
+        $userWithPelanggan = User::where('pelanggan_id', $pelanggan->id)->first();
+        if ($userWithPelanggan && $existingUserByEmail && $userWithPelanggan->id !== $existingUserByEmail->id) {
+            return back()->withErrors([
+                'email' => 'Email sudah digunakan oleh akun pelanggan lain.',
             ])->withInput();
         }
 
@@ -124,30 +128,43 @@ class AuthController extends Controller
             'alamat' => $validated['alamat'],
         ]);
 
-        User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'role_id' => $pelangganRole?->id ?? 4,
-            'pelanggan_id' => $pelanggan->id,
-        ]);
-
-        if (Auth::attempt(['email' => $validated['email'], 'password' => $validated['password']])) {
-            $request->session()->regenerate();
-
-            // pastikan pelanggan hanya bisa akses jika role sudah benar
-            if (strtolower(auth()->user()->role?->nama_role ?? '') !== 'pelanggan') {
-                Auth::logout();
-                return back()->withErrors([
-                    'email' => 'Akun ini bukan pelanggan.',
-                ])->withInput();
-            }
-
-            return redirect()->intended('pelanggan/profile');
+        if ($userWithPelanggan) {
+            $user = $userWithPelanggan;
+        } elseif ($existingUserByEmail) {
+            $user = $existingUserByEmail;
+        } else {
+            $user = null;
         }
 
+        if ($user) {
+            $user->update([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+                'role_id' => $pelangganRole?->id ?? 4,
+                'pelanggan_id' => $pelanggan->id,
+            ]);
+        } else {
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+                'role_id' => $pelangganRole?->id ?? 4,
+                'pelanggan_id' => $pelanggan->id,
+            ]);
+        }
 
-        return redirect('/login');
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        if (strtolower(auth()->user()->role?->nama_role ?? '') !== 'pelanggan') {
+            Auth::logout();
+            return back()->withErrors([
+                'email' => 'Akun ini bukan pelanggan.',
+            ])->withInput();
+        }
+
+        return redirect()->intended('pelanggan/profile');
     }
 
     public function logout(Request $request)

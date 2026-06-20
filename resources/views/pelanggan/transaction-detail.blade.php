@@ -13,6 +13,7 @@
         @if($transaksi->pembayaran)
             <p><strong>Jumlah Bayar:</strong> {{ number_format($transaksi->pembayaran->jumlah_bayar,0,',','.') }}</p>
         @endif
+        <p><strong>Poin dari Transaksi:</strong> {{ $transaksi->tambahPoin->sum('jumlah_poin') ?? 0 }}</p>
 
         <a href="{{ route('pelanggan.transactions') }}" class="btn btn-secondary">Kembali</a>
         <button type="button" class="btn btn-danger" onclick="document.getElementById('report-modal').style.display='block'">🆘 Laporkan Masalah</button>

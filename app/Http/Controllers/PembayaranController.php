@@ -53,7 +53,12 @@ class PembayaranController extends Controller
             $validated['qr_token'] = (string) Str::uuid();
             $validated['jumlah_bayar'] = 0;
             $validated['status_pembayaran'] = 'pending';
+            $validated['notified'] = false;
             $pembayaran = Pembayaran::create($validated);
+
+            if ($transaksi) {
+                $transaksi->syncStatusPembayaran();
+            }
 
             return redirect()->route('pembayaran.confirm', ['pembayaran' => $pembayaran->id, 'amount' => $amount])
                 ->with('success', 'Pembayaran dibuat — tunjukkan QR ke pelanggan');
@@ -71,9 +76,8 @@ class PembayaranController extends Controller
             'qr_token' => null,
         ]);
 
-        if ($statusPembayaran === 'lunas' && $transaksi) {
-            $transaksi->status = 'lunas';
-            $transaksi->save();
+        if ($transaksi) {
+            $transaksi->syncStatusPembayaran();
         }
 
         return redirect()->route('transaksi.index')->with('success', 'Pembayaran tunai berhasil disimpan.');
@@ -143,10 +147,8 @@ class PembayaranController extends Controller
         $pembayaran->notified = false;
         $pembayaran->save();
 
-        // update transaksi status when fully paid
-        if ($transaksi && $pembayaran->status_pembayaran === 'lunas') {
-            $transaksi->status = 'lunas';
-            $transaksi->save();
+        if ($transaksi) {
+            $transaksi->syncStatusPembayaran();
         }
 
         return view('pembayaran.complete', compact('pembayaran'));
@@ -199,21 +201,31 @@ class PembayaranController extends Controller
         $totalBayar = $sudahBayar + $validated['jumlah_bayar'];
         $statusPembayaran = $totalBayar >= $totalHarga ? 'lunas' : 'hutang';
 
-        $pembayaran->update([
+        $updateData = [
             'transaksi_id' => $validated['transaksi_id'],
             'metode_pembayaran' => $validated['metode_pembayaran'],
             'jumlah_bayar' => $totalBayar,
             'status_pembayaran' => $statusPembayaran,
-            'qr_token' => (string) Str::uuid(),
-        ]);
+        ];
 
-        // update transaksi jika sudah lunas
-        if ($pembayaran->status_pembayaran === 'lunas' && $transaksi) {
-            $transaksi->status = 'lunas';
-            $transaksi->save();
+        if ($validated['metode_pembayaran'] === 'qris') {
+            $updateData['qr_token'] = (string) Str::uuid();
+            $updateData['notified'] = false;
+        } else {
+            $updateData['qr_token'] = null;
         }
 
-        return redirect()->route('pembayaran.confirm', ['pembayaran' => $pembayaran->id, 'amount' => $validated['jumlah_bayar']])->with('success', 'Pembayaran diperbarui — tunjukkan QR ke pelanggan');
+        $pembayaran->update($updateData);
+
+        if ($transaksi) {
+            $transaksi->syncStatusPembayaran();
+        }
+
+        if ($validated['metode_pembayaran'] === 'qris') {
+            return redirect()->route('pembayaran.confirm', ['pembayaran' => $pembayaran->id, 'amount' => $validated['jumlah_bayar']])->with('success', 'Pembayaran diperbarui — tunjukkan QR ke pelanggan');
+        }
+
+        return redirect()->route('pembayaran.index')->with('success', 'Pembayaran tunai diperbarui.');
     }
 
     public function destroy(Pembayaran $pembayaran)

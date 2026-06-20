@@ -29,11 +29,23 @@
         <div class="mb-3"><strong>Email:</strong> {{ $user->email }}</div>
         <div class="mb-3"><strong>Telepon:</strong> {{ $user->pelanggan?->telepon ?? 'Belum diisi' }}</div>
         <div class="mb-3"><strong>Alamat:</strong> {{ $user->pelanggan?->alamat ?? 'Belum diisi' }}</div>
+        <div class="mb-3"><strong>Poin Loyalty:</strong> {{ $user->pelanggan?->poin ?? 0 }}</div>
 
-        <div style="display:flex; flex-wrap:wrap; gap:10px;">
+        @if(isset($notifications) && $notifications->isNotEmpty())
+        <div class="alert alert-info" style="margin-bottom:20px; padding:16px; border-radius:12px; background:#eff6ff; border:1px solid #bfdbfe; color:#1d4ed8;">
+            <strong>Notifikasi baru:</strong> Anda memiliki {{ $notifications->count() }} notifikasi belum dibaca.
+            <div style="margin-top:10px;">
+                <a href="{{ route('pelanggan.notifications') }}" class="btn btn-primary">Lihat Notifikasi</a>
+            </div>
+        </div>
+    @endif
+
+    <div style="display:flex; flex-wrap:wrap; gap:10px;">
             <a href="{{ route('pelanggan.profile.edit') }}" class="btn btn-primary">Edit Profil</a>
+            <a href="{{ route('pelanggan.points') }}" class="btn btn-success">Poin Loyalty</a>
             <a href="{{ route('pelanggan.status') }}" class="btn btn-success">Status Laundry</a>
             <a href="{{ route('pelanggan.transactions') }}" class="btn btn-primary">Riwayat Transaksi</a>
+            <a href="{{ route('pelanggan.notifications') }}" class="btn btn-secondary">Notifikasi</a>
             <button type="button" class="btn btn-danger" onclick="document.getElementById('report-modal').style.display='block'">🆘 Laporkan Masalah</button>
         </div>
 

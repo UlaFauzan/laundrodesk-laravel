@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Notifikasi;
+use App\Models\TambahPoin;
 
 class Pelanggan extends Model
 {
@@ -16,11 +18,22 @@ class Pelanggan extends Model
         'alamat',
         'nama_pelanggan',
         'no_hp',
+        'poin',
     ];
 
 public function transaksi()
 {
     return $this->hasMany(Transaksi::class, 'pelanggan_id');
+}
+
+public function notifikasi()
+{
+    return $this->hasMany(Notifikasi::class, 'pelanggan_id');
+}
+
+public function tambahPoin()
+{
+    return $this->hasMany(TambahPoin::class, 'pelanggan_id');
 }
 
 public function getIdAttribute()

@@ -7,9 +7,11 @@ use App\Models\DetailTransaksi;
 use App\Models\LogAktivitas;
 use App\Models\Pelanggan;
 use App\Models\Pembayaran;
+use App\Models\Notifikasi;
 use App\Models\Role;
 use App\Models\StatusLaundry;
 use App\Models\Transaksi;
+use App\Models\TambahPoin;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -108,6 +110,20 @@ class TransaksiController extends Controller
             'subtotal' => $validated['total_harga'],
         ]);
 
+        if ($transaksi->total_harga > 0) {
+            Pembayaran::create([
+                'transaksi_id' => $transaksi->id,
+                'jumlah_bayar' => 0,
+                'metode_pembayaran' => 'qris',
+                'status_pembayaran' => 'hutang',
+                'qr_token' => null,
+                'notified' => false,
+            ]);
+
+            $transaksi->status_pembayaran = 'hutang';
+            $transaksi->save();
+        }
+
         $transaksi->load('pelanggan', 'statusLaundry');
         $customerName = $transaksi->pelanggan?->nama ?? $validated['customer_name'] ?? 'Pelanggan Baru';
         $statusLabel = $transaksi->statusLaundry?->nama_status ?? $transaksi->status ?? 'pending';
@@ -191,6 +207,25 @@ class TransaksiController extends Controller
                 'aktivitas' => 'Status laundry untuk pelanggan ' . ($transaksi->pelanggan?->nama ?? 'Pelanggan') . ' diperbarui dari "' . $oldStatus . '" menjadi "' . $newStatus . '".',
                 'waktu' => now(),
             ]);
+
+            if (strtolower($newStatus) === 'selesai') {
+                Notifikasi::create([
+                    'pelanggan_id' => $transaksi->pelanggan_id,
+                    'pesan' => 'Pesanan laundry Anda sudah selesai. Silakan datang mengambil atau cek detail transaksi Anda.',
+                    'status_baca' => 'Belum Dibaca',
+                ]);
+
+                $poin = max(1, intval(floor($transaksi->total_harga / 10000)));
+
+                TambahPoin::create([
+                    'pelanggan_id' => $transaksi->pelanggan_id,
+                    'transaksi_id' => $transaksi->id,
+                    'jumlah_poin' => $poin,
+                    'alasan' => 'Transaksi selesai',
+                ]);
+
+                $transaksi->pelanggan?->increment('poin', $poin);
+            }
         }
 
         if (! empty($validated['jumlah_bayar']) && ! empty($validated['metode_pembayaran'])) {
@@ -230,6 +265,10 @@ class TransaksiController extends Controller
                     'qr_token' => null,
                 ]
             );
+
+            // Update status transaksi agar dashboard kasir mengenali pembayaran
+            $transaksi->status_pembayaran = $statusPembayaran;
+            $transaksi->save();
         }
 
         return redirect()->route('transaksi.index')->with('success', 'Transaksi berhasil diupdate');

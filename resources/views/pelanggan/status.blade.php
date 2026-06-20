@@ -15,14 +15,18 @@
                     {{ $transaksiTerbaru ? ($transaksiTerbaru->statusLaundry?->nama_status ?? $transaksiTerbaru->status ?? '-') : '-' }}
                 </div>
             </div>
-
+            <div style="min-width: 220px;">
+                <div style="font-weight: 900; margin-bottom: 6px;">Poin Loyalty Anda</div>
+                <div>{{ auth()->user()->pelanggan?->poin ?? 0 }} poin</div>
+            </div>
         </div>
 
         <div style="margin-top: 10px; color: var(--muted); font-weight: 700; font-size: 13px;">
             Riwayat transaksi bisa dilihat di menu <b>Riwayat Transaksi</b>.
         </div>
 
-        <div style="margin-top: 16px;">
+        <div style="margin-top: 16px; display:flex; flex-wrap:wrap; gap:10px;">
+            <a href="{{ route('pelanggan.points') }}" class="btn btn-primary">Lihat Poin Loyalty</a>
             <button type="button" class="btn btn-danger" onclick="document.getElementById('report-modal').style.display='block'">🆘 Laporkan Masalah</button>
         </div>
     </div>

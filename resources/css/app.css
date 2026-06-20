@@ -6,6 +6,454 @@
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    --font-sans: Inter, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /* Blue + Aqua palette */
+    --color-blue-50: #eff6ff;
+    --color-blue-100: #dbeafe;
+    --color-blue-200: #bfdbfe;
+    --color-blue-300: #93c5fd;
+    --color-blue-400: #60a5fa;
+    --color-blue-500: #0f6bff;
+    --color-blue-600: #0b4fba;
+    --color-blue-700: #0a3d8f;
+    --color-blue-800: #082f6e;
+    --color-blue-900: #06204d;
+    --color-blue-950: #041433;
+
+    --color-aqua-50: #ecfeff;
+    --color-aqua-100: #cffafe;
+    --color-aqua-200: #a5f3fc;
+    --color-aqua-300: #67e8f9;
+    --color-aqua-400: #22d3ee;
+    --color-aqua-500: #06b6d4;
+    --color-aqua-600: #0891b2;
+    --color-aqua-700: #0e7490;
+    --color-aqua-800: #155e75;
+    --color-aqua-900: #164e63;
+    --color-aqua-950: #083344;
+
+    --color-ice: #f0f9ff;
+    --color-sidebar: #0a3d8f;
+    --color-sidebar-hover: #0b4fba;
+    --color-sidebar-text: rgba(255, 255, 255, 0.85);
+    --color-sidebar-active: #22d3ee;
+
+    --shadow-soft: 0 4px 16px rgba(15, 107, 255, 0.08), 0 1px 4px rgba(15, 107, 255, 0.04);
+    --shadow-card: 0 1px 3px rgba(15, 107, 255, 0.06), 0 4px 24px rgba(15, 107, 255, 0.08);
+    --shadow-table: 0 1px 2px rgba(15, 107, 255, 0.04), 0 8px 24px rgba(15, 107, 255, 0.06);
+}
+
+@layer base {
+    body {
+        @apply bg-ice text-slate-800 font-sans antialiased;
+    }
+
+    h1 {
+        @apply text-2xl font-bold tracking-tight text-slate-900;
+    }
+
+    h2 {
+        @apply text-xl font-bold tracking-tight text-slate-900;
+    }
+
+    h3 {
+        @apply text-base font-bold tracking-tight text-slate-900;
+    }
+
+    label {
+        @apply block mb-1.5 text-xs font-semibold uppercase tracking-wider text-slate-500;
+    }
+
+    input,
+    select,
+    textarea {
+        @apply block w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900
+               placeholder:text-slate-400 outline-none transition duration-150 ease-in-out;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+        @apply border-blue-400 ring-4 ring-blue-100;
+    }
+
+    textarea {
+        @apply min-h-24 resize-y;
+    }
+
+    select {
+        @apply pr-8;
+    }
+}
+
+@layer components {
+    /* ── App Shell ── */
+    .app-shell {
+        @apply grid min-h-screen grid-cols-[256px_minmax(0,1fr)];
+    }
+
+    .app-shell--single {
+        @apply grid-cols-1;
+    }
+
+    /* ── Topbar ── */
+    .topbar {
+        @apply sticky top-0 z-30 col-span-full flex min-h-[64px] items-center justify-between gap-4
+               border-b border-slate-200 bg-white/80 px-6 py-3 backdrop-blur-xl;
+    }
+
+    .topbar__brand,
+    .topbar__account {
+        @apply flex items-center gap-3 min-w-0;
+    }
+
+    .brand-mark {
+        @apply inline-flex items-center gap-3 min-w-0 no-underline;
+    }
+
+    .brand-mark__icon {
+        @apply inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600
+               text-xs font-bold text-white shadow-sm;
+    }
+
+    .brand-mark strong {
+        @apply block text-sm font-bold text-slate-900 truncate;
+    }
+
+    .brand-mark small {
+        @apply block text-xs font-medium text-slate-400 truncate;
+    }
+
+    /* ── Account Chip ── */
+    .account-chip {
+        @apply inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white py-1 pl-1 pr-3.5 shadow-sm;
+    }
+
+    .account-chip__avatar {
+        @apply inline-flex h-7 w-7 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700;
+    }
+
+    .account-chip__text {
+        @apply text-sm font-medium text-slate-700 truncate max-w-[160px];
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+        @apply sticky top-[64px] z-20 h-[calc(100vh-64px)] self-start overflow-y-auto
+               bg-gradient-to-b from-blue-700 to-blue-800 p-4;
+    }
+
+    .sidebar-menu {
+        @apply grid gap-1 list-none p-0;
+    }
+
+    .sidebar-menu a {
+        @apply flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-sm font-medium text-blue-100/80
+               transition-all duration-150 ease-in-out no-underline;
+    }
+
+    .sidebar-menu a:hover {
+        @apply bg-white/10 text-white;
+    }
+
+    .sidebar-menu a.active {
+        @apply bg-aqua-400/20 text-white font-semibold shadow-sm;
+    }
+
+    .sidebar-menu .nav-icon {
+        @apply inline-flex h-5 w-5 shrink-0 items-center justify-center text-base;
+    }
+
+    /* ── Content ── */
+    .content {
+        @apply min-w-0 overflow-x-auto p-6;
+    }
+
+    .app-shell--single .content {
+        @apply mx-auto w-full max-w-6xl;
+    }
+
+    /* ── Cards ── */
+    .card,
+    .page-card,
+    .panel,
+    .form-card {
+        @apply rounded-xl border border-slate-200 bg-white shadow-card;
+    }
+
+    .card,
+    .page-card {
+        @apply p-6;
+    }
+
+    .form-card {
+        @apply p-6 w-full;
+    }
+
+    /* ── Page Header ── */
+    .page-header {
+        @apply mb-6 flex items-start justify-between gap-4;
+    }
+
+    .page-header h1,
+    .page-header h2 {
+        @apply mb-1;
+    }
+
+    .page-header p,
+    .help-text,
+    .text-muted {
+        @apply text-sm text-slate-500;
+    }
+
+    /* ── Forms ── */
+    .form-grid {
+        @apply grid grid-cols-2 gap-4;
+    }
+
+    .field--full {
+        @apply col-span-full;
+    }
+
+    .field,
+    .form-group {
+        @apply mb-4;
+    }
+
+    .form-actions,
+    .actions {
+        @apply flex flex-wrap gap-2 pt-2;
+    }
+
+    .form-actions .btn,
+    .actions .btn {
+        @apply m-0;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+        @apply inline-flex items-center justify-center gap-1.5 rounded-xl border px-4 py-2.5 text-sm font-semibold
+               leading-tight no-underline cursor-pointer transition-all duration-150 ease-in-out select-none;
+        min-height: 40px;
+    }
+
+    .btn-compact {
+        @apply px-3 py-1.5 text-xs;
+        min-height: 32px;
+    }
+
+    .btn-primary {
+        @apply border-blue-600 bg-blue-600 text-white shadow-sm hover:bg-blue-700 hover:border-blue-700 active:bg-blue-800;
+    }
+
+    .btn-success {
+        @apply border-aqua-500 bg-aqua-500 text-white shadow-sm hover:bg-aqua-600 hover:border-aqua-600 active:bg-aqua-700;
+    }
+
+    .btn-danger {
+        @apply border-red-200 bg-red-50 text-red-600 hover:bg-red-100 hover:border-red-300 active:bg-red-200;
+    }
+
+    .btn-secondary {
+        @apply border-slate-200 bg-white text-slate-600 shadow-sm hover:bg-slate-50 hover:border-slate-300 active:bg-slate-100;
+    }
+
+    .btn-outline-blue {
+        @apply border-blue-200 bg-white text-blue-600 hover:bg-blue-50 hover:border-blue-300 active:bg-blue-100;
+    }
+
+    .btn-warning {
+        @apply border-amber-200 bg-amber-50 text-amber-600 hover:bg-amber-100 hover:border-amber-300;
+    }
+
+    /* ── Inline Form ── */
+    .inline-form {
+        @apply inline;
+    }
+
+    /* ── Tables ── */
+    .table-wrapper {
+        @apply overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-table;
+    }
+
+    .table {
+        @apply w-full border-collapse;
+    }
+
+    .table th {
+        @apply px-4 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500
+               bg-slate-50/80 border-b border-slate-200;
+    }
+
+    .table td {
+        @apply px-4 py-3.5 text-sm text-slate-700 border-b border-slate-100 align-middle;
+    }
+
+    .table tbody tr:last-child td {
+        @apply border-b-0;
+    }
+
+    .table tbody tr:hover {
+        @apply bg-blue-50/40;
+    }
+
+    .table-empty {
+        @apply px-4 py-12 text-center text-sm font-medium text-slate-400;
+    }
+
+    /* ── Status Badges ── */
+    .status-badge {
+        @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold;
+    }
+
+    .status-badge--success {
+        @apply bg-emerald-50 text-emerald-700 border border-emerald-200;
+    }
+
+    .status-badge--warning {
+        @apply bg-amber-50 text-amber-700 border border-amber-200;
+    }
+
+    .status-badge--danger {
+        @apply bg-red-50 text-red-700 border border-red-200;
+    }
+
+    .status-badge--info {
+        @apply bg-blue-50 text-blue-700 border border-blue-200;
+    }
+
+    .status-text {
+        @apply inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold;
+    }
+
+    .status-text--success {
+        @apply bg-emerald-50 text-emerald-700;
+    }
+
+    .status-text--warning {
+        @apply bg-amber-50 text-amber-700;
+    }
+
+    .status-text--danger {
+        @apply bg-red-50 text-red-700;
+    }
+
+    /* ── Alerts ── */
+    .alert {
+        @apply rounded-xl border px-4 py-3 text-sm font-medium mb-4;
+    }
+
+    .alert-error {
+        @apply border-red-200 bg-red-50 text-red-700;
+    }
+
+    .alert-success {
+        @apply border-emerald-200 bg-emerald-50 text-emerald-700;
+    }
+
+    /* ── Summary Cards (Admin Dashboard) ── */
+    .summary-grid {
+        @apply grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4;
+    }
+
+    .summary-card {
+        @apply rounded-xl border border-slate-200 bg-white p-5 shadow-card transition-all duration-150;
+    }
+
+    .summary-card:hover {
+        @apply shadow-md border-blue-200;
+    }
+
+    .summary-card__label {
+        @apply block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5;
+    }
+
+    .summary-card__value {
+        @apply block text-2xl font-bold text-slate-900;
+    }
+
+    /* ── Activity Feed ── */
+    .activity-feed {
+        @apply divide-y divide-slate-100;
+    }
+
+    .activity-item {
+        @apply flex items-start gap-3 py-3;
+    }
+
+    .activity-time {
+        @apply text-xs font-semibold text-blue-600 shrink-0 min-w-[48px];
+    }
+
+    .activity-text {
+        @apply text-sm text-slate-600;
+    }
+
+    /* ── Chart Container ── */
+    .chart-container {
+        @apply rounded-xl border border-slate-200 bg-white p-5 shadow-card;
+    }
+
+    .chart-container h3 {
+        @apply mb-4 text-sm font-semibold text-slate-700;
+    }
+
+    /* ── Link Card (admin action grid) ── */
+    .action-grid {
+        @apply grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3;
+    }
+
+    .action-card {
+        @apply flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm
+               transition-all duration-150 no-underline text-slate-700 hover:border-blue-200 hover:shadow-md hover:text-blue-700;
+    }
+
+    .action-card__icon {
+        @apply inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 text-lg;
+    }
+
+    .action-card__label {
+        @apply text-sm font-semibold;
+    }
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+    .app-shell {
+        @apply grid-cols-1;
+    }
+
+    .sidebar {
+        @apply static h-auto border-r-0 border-b border-blue-800/30 overflow-x-auto;
+    }
+
+    .sidebar-menu {
+        @apply flex gap-1 overflow-x-auto pb-1;
+    }
+
+    .sidebar-menu li {
+        @apply shrink-0;
+    }
+
+    .sidebar-menu a {
+        @apply whitespace-nowrap;
+    }
+
+    .topbar {
+        @apply static flex-wrap;
+    }
+
+    .content {
+        @apply px-4 py-5;
+    }
+
+    .form-grid {
+        @apply grid-cols-1;
+    }
+
+    .summary-grid {
+        @apply grid-cols-2;
+    }
 }

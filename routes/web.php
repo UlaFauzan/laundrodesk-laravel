@@ -105,6 +105,9 @@ Route::middleware(['auth', 'role:pelanggan'])->group(function () {
     Route::get('/pelanggan/profile/edit', [PelangganController::class, 'editProfile'])->name('pelanggan.profile.edit');
     Route::put('/pelanggan/profile', [PelangganController::class, 'updateProfile'])->name('pelanggan.profile.update');
     Route::get('/pelanggan/status', [PelangganController::class, 'status'])->name('pelanggan.status');
+    Route::get('/pelanggan/points', [PelangganController::class, 'points'])->name('pelanggan.points');
+    Route::get('/pelanggan/notifications', [PelangganController::class, 'notifications'])->name('pelanggan.notifications');
+    Route::post('/pelanggan/notifications/{notifikasi}/read', [PelangganController::class, 'markNotificationRead'])->name('pelanggan.notifications.read');
 
     // Riwayat transaksi pelanggan
     Route::get('/pelanggan/transactions', [PelangganController::class, 'transactions'])->name('pelanggan.transactions');

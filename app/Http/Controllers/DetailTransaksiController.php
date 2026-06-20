@@ -12,14 +12,14 @@ class DetailTransaksiController extends Controller
     public function index()
     {
         $detail = DetailTransaksi::with(['transaksi', 'layanan'])->get();
-        return view('detail-transaksi.index', compact('detail'));
+        return view('detail_transaksi.index', compact('detail'));
     }
 
     public function create()
     {
         $transaksi = Transaksi::all();
         $layanan = Layanan::all();
-        return view('detail-transaksi.create', compact('transaksi', 'layanan'));
+        return view('detail_transaksi.create', compact('transaksi', 'layanan'));
     }
 
     public function store(Request $request)
@@ -37,14 +37,14 @@ class DetailTransaksiController extends Controller
 
     public function show(DetailTransaksi $detailTransaksi)
     {
-        return view('detail-transaksi.show', compact('detailTransaksi'));
+        return view('detail_transaksi.show', compact('detailTransaksi'));
     }
 
     public function edit(DetailTransaksi $detailTransaksi)
     {
         $transaksi = Transaksi::all();
         $layanan = Layanan::all();
-        return view('detail-transaksi.edit', compact('detailTransaksi', 'transaksi', 'layanan'));
+        return view('detail_transaksi.edit', compact('detailTransaksi', 'transaksi', 'layanan'));
     }
 
     public function update(Request $request, DetailTransaksi $detailTransaksi)

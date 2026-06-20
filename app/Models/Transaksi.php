@@ -49,6 +49,11 @@ class Transaksi extends Model
     {
         return $this->hasOne(Pembayaran::class, 'transaksi_id');
     }
+
+    public function tambahPoin()
+    {
+        return $this->hasMany(TambahPoin::class, 'transaksi_id');
+    }
     
     public function detailTransaksi()
     {
@@ -99,7 +104,7 @@ class Transaksi extends Model
     public function getStatusPembayaranSebenarnya()
     {
         if (!$this->pembayaran) {
-            return 'Belum Bayar';
+            return $this->total_harga > 0 ? 'hutang' : 'Belum Bayar';
         }
 
         $sisa = $this->total_harga - $this->pembayaran->jumlah_bayar;
@@ -109,6 +114,18 @@ class Transaksi extends Model
         } else {
             return 'hutang';
         }
+    }
+
+    public function syncStatusPembayaran()
+    {
+        $status = $this->getStatusPembayaranSebenarnya();
+
+        if ($this->status_pembayaran !== $status) {
+            $this->status_pembayaran = $status;
+            $this->saveQuietly();
+        }
+
+        return $status;
     }
 
     // Method untuk mengetahui sisa pembayaran

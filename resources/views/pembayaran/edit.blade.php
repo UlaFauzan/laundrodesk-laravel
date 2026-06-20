@@ -1,51 +1,75 @@
-﻿<h1>Edit Pembayaran</h1>
+@extends('layout')
 
-@if ($errors->any())
-    <div style="color: red; margin-bottom: 16px;">
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
+@section('title', 'Edit Pembayaran')
+
+@section('content')
+    <div class="page-header">
+        <div>
+            <h1>Edit Pembayaran</h1>
+            <p>Tambahkan pembayaran untuk melunasi sisa hutang transaksi.</p>
+        </div>
     </div>
-@endif
 
-<form action="/pembayaran/{{ $pembayaran->id }}" method="POST">
-    @csrf
-    @method('PUT')
+    <form class="form-card" action="/pembayaran/{{ $pembayaran->id }}" method="POST">
+        @csrf
+        @method('PUT')
 
-    <p><strong>ID Transaksi:</strong> #{{ $pembayaran->transaksi->id }}</p>
-    <p><strong>Pelanggan:</strong> {{ $pembayaran->transaksi->pelanggan->nama }}</p>
-    <p><strong>Layanan:</strong> {{ $pembayaran->transaksi->layanan->nama_layanan }}</p>
-    <p><strong>Total Harga:</strong> Rp{{ number_format($pembayaran->transaksi->total_harga, 0, ',', '.') }}</p>
-    <p><strong>Sudah Dibayar:</strong> Rp{{ number_format($pembayaran->jumlah_bayar, 0, ',', '.') }}</p>
-    <p><strong>Sisa Hutang:</strong> Rp{{ number_format($sisa, 0, ',', '.') }}</p>
+        <dl class="detail-list">
+            <div class="detail-row">
+                <dt>ID Transaksi</dt>
+                <dd>#{{ $pembayaran->transaksi->id }}</dd>
+            </div>
+            <div class="detail-row">
+                <dt>Pelanggan</dt>
+                <dd>{{ $pembayaran->transaksi->pelanggan->nama }}</dd>
+            </div>
+            <div class="detail-row">
+                <dt>Layanan</dt>
+                <dd>{{ $pembayaran->transaksi->layanan->nama_layanan }}</dd>
+            </div>
+            <div class="detail-row">
+                <dt>Total Harga</dt>
+                <dd>Rp{{ number_format($pembayaran->transaksi->total_harga, 0, ',', '.') }}</dd>
+            </div>
+            <div class="detail-row">
+                <dt>Sudah Dibayar</dt>
+                <dd>Rp{{ number_format($pembayaran->jumlah_bayar, 0, ',', '.') }}</dd>
+            </div>
+            <div class="detail-row">
+                <dt>Sisa Hutang</dt>
+                <dd>Rp{{ number_format($sisa, 0, ',', '.') }}</dd>
+            </div>
+        </dl>
 
-    <input type="hidden" name="transaksi_id" value="{{ $pembayaran->transaksi_id }}">
+        <input type="hidden" name="transaksi_id" value="{{ $pembayaran->transaksi_id }}">
 
-    <label>Bayar Tambahan</label>
-    <input
-        id="jumlah_bayar"
-        type="number"
-        name="jumlah_bayar"
-        min="1"
-        max="{{ $sisa }}"
-        value="{{ old('jumlah_bayar', $sisa) }}"
-        required
-    >
+        <div class="form-grid">
+            <div class="field">
+                <label for="jumlah_bayar">Bayar Tambahan</label>
+                <input
+                    id="jumlah_bayar"
+                    type="number"
+                    name="jumlah_bayar"
+                    min="1"
+                    max="{{ $sisa }}"
+                    value="{{ old('jumlah_bayar', $sisa) }}"
+                    required
+                >
+            </div>
 
-    <br><br>
+            <div class="field">
+                <label for="metode_pembayaran">Metode Pembayaran</label>
+                <select id="metode_pembayaran" name="metode_pembayaran" required>
+                    <option value="">Pilih metode</option>
+                    <option value="tunai" {{ old('metode_pembayaran', $pembayaran->metode_pembayaran) == 'tunai' ? 'selected' : '' }}>Tunai</option>
+                    <option value="qris" {{ old('metode_pembayaran', $pembayaran->metode_pembayaran) == 'qris' ? 'selected' : '' }}>QRIS</option>
+                </select>
+            </div>
+        </div>
 
-    <label>Metode Pembayaran</label>
-    <select id="metode_pembayaran" name="metode_pembayaran" required>
-        <option value="">Pilih metode</option>
-        <option value="tunai" {{ old('metode_pembayaran', $pembayaran->metode_pembayaran) == 'tunai' ? 'selected' : '' }}>Tunai</option>
-        <option value="qris" {{ old('metode_pembayaran', $pembayaran->metode_pembayaran) == 'qris' ? 'selected' : '' }}>QRIS</option>
-    </select>
-
-    <br><br>
-
-    <button type="submit">
-        Update Pembayaran
-    </button>
-</form>
+        <div class="actions">
+            <button type="submit" class="btn btn-primary">Update Pembayaran</button>
+            <a href="/pembayaran" class="btn btn-secondary">Kembali</a>
+        </div>
+    </form>
+@endsection

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Pelanggan;
 use App\Models\Transaksi;
+use App\Models\Notifikasi;
+use App\Models\TambahPoin;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -42,9 +44,46 @@ class PelangganController extends Controller
 
     public function profile()
     {
+        $pelanggan = auth()->user()->pelanggan;
+        $notifications = collect();
+
+        if ($pelanggan) {
+            $notifications = $pelanggan->notifikasi()
+                ->where('status_baca', '!=', 'Sudah Dibaca')
+                ->orderByDesc('created_at')
+                ->get();
+        }
+
         return view('pelanggan.profile', [
             'user' => auth()->user(),
+            'notifications' => $notifications,
         ]);
+    }
+
+    public function notifications()
+    {
+        $pelanggan = auth()->user()->pelanggan;
+
+        if (! $pelanggan) {
+            return redirect()->route('pelanggan.profile')->withErrors('Data pelanggan tidak ditemukan.');
+        }
+
+        $notifications = $pelanggan->notifikasi()
+            ->orderByDesc('created_at')
+            ->get();
+
+        return view('pelanggan.notifications', compact('notifications'));
+    }
+
+    public function markNotificationRead(Notifikasi $notifikasi)
+    {
+        $pelanggan = auth()->user()->pelanggan;
+        if (! $pelanggan || $notifikasi->pelanggan_id !== $pelanggan->id) {
+            abort(403);
+        }
+
+        $notifikasi->update(['status_baca' => 'Sudah Dibaca']);
+        return back()->with('success', 'Notifikasi berhasil ditandai sudah dibaca.');
     }
 
     public function status()
@@ -71,7 +110,7 @@ class PelangganController extends Controller
                 return redirect()->route('pelanggan.profile')->withErrors('Data pelanggan tidak ditemukan.');
             }
 
-            $transaksi = Transaksi::with(['layanan', 'statusLaundry', 'pembayaran'])
+            $transaksi = Transaksi::with(['layanan', 'statusLaundry', 'pembayaran', 'tambahPoin'])
                 ->where('pelanggan_id', $pelanggan->id)
                 ->orderBy('tanggal_masuk', 'desc')
                 ->paginate(10);
@@ -86,6 +125,19 @@ class PelangganController extends Controller
         }
     }
 
+    public function points()
+    {
+        $pelanggan = auth()->user()->pelanggan;
+
+        if (! $pelanggan) {
+            return redirect()->route('pelanggan.profile')->withErrors('Data pelanggan tidak ditemukan.');
+        }
+
+        $points = $pelanggan->tambahPoin()->orderByDesc('created_at')->get();
+
+        return view('pelanggan.points', compact('pelanggan', 'points'));
+    }
+
     public function showTransaction(Transaksi $transaksi)
     {
         try {
@@ -94,7 +146,7 @@ class PelangganController extends Controller
                 abort(403);
             }
 
-            $transaksi->load(['layanan', 'statusLaundry', 'pembayaran', 'detailTransaksi']);
+            $transaksi->load(['layanan', 'statusLaundry', 'pembayaran', 'detailTransaksi', 'tambahPoin']);
             return view('pelanggan.transaction-detail', compact('transaksi'));
         } catch (\Exception $e) {
             return view('error.error-page', [

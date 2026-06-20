@@ -1,107 +1,107 @@
-<h1>Edit Transaksi</h1>
+@extends('layout')
 
-<form action="/transaksi/{{ $transaksi->id }}" method="POST">
-    @csrf
-    @method('PUT')
+@section('title', 'Edit Transaksi')
 
-    <label>Pelanggan</label>
-    <select name="pelanggan_id">
+@section('content')
+    <div class="page-header">
+        <div>
+            <h1>Edit Transaksi</h1>
+            <p>Perbarui data transaksi, status laundry, dan pembayaran.</p>
+        </div>
+    </div>
 
-        @foreach($pelanggan as $p)
-        <option value="{{ $p->id }}"
-            {{ $transaksi->pelanggan_id == $p->id ? 'selected' : '' }}>
-            {{ $p->nama }}
-        </option>
-        @endforeach
+    <form class="form-card" action="/transaksi/{{ $transaksi->id }}" method="POST">
+        @csrf
+        @method('PUT')
 
-    </select>
+        <h3 class="section-title">Data Transaksi</h3>
 
-    <br><br>
+        <div class="form-grid">
+            <div class="field">
+                <label for="pelanggan_id">Pelanggan</label>
+                <select id="pelanggan_id" name="pelanggan_id">
+                    @foreach($pelanggan as $p)
+                        <option value="{{ $p->id }}" {{ old('pelanggan_id', $transaksi->pelanggan_id) == $p->id ? 'selected' : '' }}>
+                            {{ $p->nama }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
 
-    <label>Layanan</label>
-    <select name="layanan_id">
+            <div class="field">
+                <label for="layanan_id">Layanan</label>
+                <select id="layanan_id" name="layanan_id">
+                    @foreach($layanan as $l)
+                        <option value="{{ $l->id }}" {{ old('layanan_id', $transaksi->layanan_id) == $l->id ? 'selected' : '' }}>
+                            {{ $l->nama_layanan }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
 
-        @foreach($layanan as $l)
-        <option value="{{ $l->id }}"
-            {{ $transaksi->layanan_id == $l->id ? 'selected' : '' }}>
-            {{ $l->nama_layanan }}
-        </option>
-        @endforeach
+            <div class="field">
+                <label for="berat_kg">Berat KG</label>
+                <input id="berat_kg" type="number" step="0.01" name="berat_kg" value="{{ old('berat_kg', $transaksi->berat_kg) }}">
+            </div>
 
-    </select>
+            <div class="field">
+                <label for="total_harga">Total Harga</label>
+                <input id="total_harga" type="number" name="total_harga" value="{{ old('total_harga', $transaksi->total_harga) }}">
+            </div>
 
-    <br><br>
+            <div class="field">
+                <label for="status_laundry_id">Status Laundry</label>
+                <select id="status_laundry_id" name="status_laundry_id">
+                    <option value="">Pilih status</option>
+                    @foreach($statusLaundry as $status)
+                        <option value="{{ $status->id }}" {{ old('status_laundry_id', $transaksi->status_laundry_id) == $status->id ? 'selected' : '' }}>
+                            {{ $status->nama_status }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
 
-    <label>Berat KG</label>
-    <input type="number"
-           step="0.01"
-           name="berat_kg"
-           value="{{ $transaksi->berat_kg }}">
+            <div class="field">
+                <label for="tanggal_masuk">Tanggal Masuk</label>
+                <input id="tanggal_masuk" type="date" name="tanggal_masuk" value="{{ old('tanggal_masuk', $transaksi->tanggal_masuk) }}">
+            </div>
 
-    <br><br>
+            <div class="field">
+                <label for="tanggal_selesai">Tanggal Selesai</label>
+                <input id="tanggal_selesai" type="date" name="tanggal_selesai" value="{{ old('tanggal_selesai', $transaksi->tanggal_selesai) }}">
+            </div>
+        </div>
 
-    <label>Total Harga</label>
-    <input type="number"
-           name="total_harga"
-           value="{{ $transaksi->total_harga }}">
+        @if(! $transaksi->pembayaran || $transaksi->pembayaran->status_pembayaran !== 'lunas')
+            <h3 class="section-title">Data Pembayaran</h3>
 
-    <br><br>
+            <div class="form-grid">
+                <div class="field">
+                    <label for="jumlah_bayar">Jumlah Bayar</label>
+                    <input id="jumlah_bayar" type="number" name="jumlah_bayar" value="{{ old('jumlah_bayar', $transaksi->pembayaran->jumlah_bayar ?? '') }}" min="0">
+                </div>
 
-    <label>Status Laundry</label>
-    <select name="status_laundry_id">
-        <option value="">-- Pilih Status --</option>
-        @foreach($statusLaundry as $status)
-            <option value="{{ $status->id }}"
-                {{ old('status_laundry_id', $transaksi->status_laundry_id) == $status->id ? 'selected' : '' }}>
-                {{ $status->nama_status }}
-            </option>
-        @endforeach
-    </select>
+                <div class="field">
+                    <label for="metode_pembayaran">Metode Pembayaran</label>
+                    <select id="metode_pembayaran" name="metode_pembayaran">
+                        <option value="">Pilih metode</option>
+                        <option value="tunai" {{ old('metode_pembayaran', $transaksi->pembayaran->metode_pembayaran ?? '') == 'tunai' ? 'selected' : '' }}>Tunai</option>
+                        <option value="qris" {{ old('metode_pembayaran', $transaksi->pembayaran->metode_pembayaran ?? '') == 'qris' ? 'selected' : '' }}>QRIS</option>
+                    </select>
+                </div>
+            </div>
 
-    <br><br>
-
-    <label>Tanggal Masuk</label>
-    <input type="date"
-           name="tanggal_masuk"
-           value="{{ $transaksi->tanggal_masuk }}">
-
-    <br><br>
-
-    <label>Tanggal Selesai</label>
-    <input type="date"
-           name="tanggal_selesai"
-           value="{{ $transaksi->tanggal_selesai }}">
-
-    <br><br>
-
-    @if(! $transaksi->pembayaran || $transaksi->pembayaran->status_pembayaran !== 'lunas')
-        <h2>Data Pembayaran</h2>
-
-        <label>Jumlah Bayar</label>
-        <input type="number"
-               name="jumlah_bayar"
-               value="{{ old('jumlah_bayar', $transaksi->pembayaran->jumlah_bayar ?? '') }}"
-               min="0">
-
-        <br><br>
-
-        <label>Metode Pembayaran</label>
-        <select name="metode_pembayaran">
-            <option value="">-- Pilih metode --</option>
-            <option value="tunai" {{ old('metode_pembayaran', $transaksi->pembayaran->metode_pembayaran ?? '') == 'tunai' ? 'selected' : '' }}>Tunai</option>
-            <option value="qris" {{ old('metode_pembayaran', $transaksi->pembayaran->metode_pembayaran ?? '') == 'qris' ? 'selected' : '' }}>QRIS</option>
-        </select>
-
-        <br><br>
-
-        @if($transaksi->pembayaran)
-            <p>Status saat ini: <strong>{{ $transaksi->pembayaran->status_pembayaran }}</strong></p>
-            <p>Sisa: <strong>Rp{{ number_format(max(0, $transaksi->total_harga - $transaksi->pembayaran->jumlah_bayar), 0, ',', '.') }}</strong></p>
-            <br><br>
+            @if($transaksi->pembayaran)
+                <div class="alert alert-info">
+                    Status saat ini: <strong>{{ $transaksi->pembayaran->status_pembayaran }}</strong><br>
+                    Sisa: <strong>Rp{{ number_format(max(0, $transaksi->total_harga - $transaksi->pembayaran->jumlah_bayar), 0, ',', '.') }}</strong>
+                </div>
+            @endif
         @endif
-    @endif
 
-    <button type="submit">
-        Update
-    </button>
-</form>
+        <div class="actions">
+            <button type="submit" class="btn btn-primary">Update</button>
+            <a href="/transaksi" class="btn btn-secondary">Kembali</a>
+        </div>
+    </form>
+@endsection
