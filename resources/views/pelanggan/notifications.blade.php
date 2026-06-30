@@ -12,6 +12,9 @@
                     <div style="display:flex; justify-content:space-between; gap:10px; align-items:flex-start;">
                         <div>
                             <p style="margin:0 0 8px; font-weight:700;">{{ $notification->pesan }}</p>
+                            @if($notification->errorReport?->admin_note)
+                                <p style="margin:0 0 8px; color:#374151;">Catatan admin: {{ $notification->errorReport->admin_note }}</p>
+                            @endif
                             <p style="margin:0; color:var(--muted); font-size:.95rem;">{{ $notification->created_at->format('d M Y H:i') }}</p>
                         </div>
                         @if($notification->status_baca !== 'Sudah Dibaca')

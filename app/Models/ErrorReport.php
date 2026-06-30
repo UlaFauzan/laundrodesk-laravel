@@ -14,6 +14,7 @@ class ErrorReport extends Model
         'description',
         'error_details',
         'resolved_at',
+        'admin_note',
     ];
 
     protected $casts = [

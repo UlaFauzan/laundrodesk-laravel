@@ -69,6 +69,7 @@ class PelangganController extends Controller
         }
 
         $notifications = $pelanggan->notifikasi()
+            ->with('errorReport')
             ->orderByDesc('created_at')
             ->get();
 

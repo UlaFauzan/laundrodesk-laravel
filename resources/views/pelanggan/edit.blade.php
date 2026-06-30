@@ -1,27 +1,39 @@
-<h1>Edit Pelanggan</h1>
+@extends('layout')
 
-<form action="/pelanggan/{{ $pelanggan->id }}" method="POST">
-    @csrf
-    @method('PUT')
+@section('title', 'Edit Pelanggan')
 
-    <label>Nama</label>
-    <input type="text" name="nama"
-        value="{{ $pelanggan->nama }}">
+@section('content')
+    <div class="page-header">
+        <div>
+            <h1>Edit Pelanggan</h1>
+            <p>Perbarui data pelanggan yang terdaftar.</p>
+        </div>
+    </div>
 
-    <br><br>
+    <form class="form-card" action="/pelanggan/{{ $pelanggan->id }}" method="POST">
+        @csrf
+        @method('PUT')
 
-    <label>Telepon</label>
-    <input type="text" name="telepon"
-        value="{{ $pelanggan->telepon }}">
+        <div class="form-grid">
+            <div class="field">
+                <label for="nama">Nama</label>
+                <input id="nama" type="text" name="nama" value="{{ old('nama', $pelanggan->nama) }}" required placeholder="Masukkan nama pelanggan">
+            </div>
 
-    <br><br>
+            <div class="field">
+                <label for="telepon">Telepon</label>
+                <input id="telepon" type="text" name="telepon" value="{{ old('telepon', $pelanggan->telepon) }}" required placeholder="Contoh: 0812xxxx">
+            </div>
 
-    <label>Alamat</label>
-    <textarea name="alamat">{{ $pelanggan->alamat }}</textarea>
+            <div class="field field--full">
+                <label for="alamat">Alamat</label>
+                <textarea id="alamat" name="alamat" rows="4" required placeholder="Masukkan alamat pelanggan">{{ old('alamat', $pelanggan->alamat) }}</textarea>
+            </div>
+        </div>
 
-    <br><br>
-
-    <button type="submit">
-        Update
-    </button>
-</form>
+        <div class="actions">
+            <button type="submit" class="btn btn-primary">Update</button>
+            <a href="/pelanggan" class="btn btn-secondary">Kembali</a>
+        </div>
+    </form>
+@endsection

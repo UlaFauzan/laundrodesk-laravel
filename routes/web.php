@@ -65,6 +65,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
     // Error Reports
     Route::resource('error-reports', ErrorReportController::class)->only(['index', 'show']);
+    Route::post('/error-reports/{id}/resolve', [ErrorReportController::class, 'resolve'])->name('error-reports.resolve');
     
     // Job Queue - Disembunyikan (belum digunakan)
     // Route::resource('jobs', JobController::class)->only(['index', 'show', 'destroy']);

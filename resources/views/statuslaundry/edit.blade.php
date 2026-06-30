@@ -1,17 +1,29 @@
-<h2>Edit Status Laundry</h2>
+@extends('layout')
 
-<div class="page-card">
-    <form action="/status-laundry/{{ $statusLaundry->id }}" method="POST">
+@section('title', 'Edit Status Laundry')
+
+@section('content')
+    <div class="page-header">
+        <div>
+            <h1>Edit Status Laundry</h1>
+            <p>Perbarui nama status laundry.</p>
+        </div>
+    </div>
+
+    <form class="form-card" action="/status-laundry/{{ $statusLaundry->id }}" method="POST">
         @csrf
         @method('PUT')
 
-        <div style="margin-bottom: 14px;">
-            <label>Status</label>
-            <input type="text" name="nama_status" value="{{ $statusLaundry->nama_status }}" style="width: 100%;" required>
+        <div class="form-grid">
+            <div class="field field--full">
+                <label for="nama_status">Status</label>
+                <input id="nama_status" type="text" name="nama_status" value="{{ old('nama_status', $statusLaundry->nama_status) }}" placeholder="Contoh: Selesai" required>
+            </div>
         </div>
 
-        <button type="submit" class="btn btn-primary" style="width: auto;">Update</button>
-        <a href="/status-laundry" class="btn btn-primary" style="width: auto;">Kembali</a>
+        <div class="actions">
+            <button type="submit" class="btn btn-primary">Update</button>
+            <a href="/status-laundry" class="btn btn-secondary">Kembali</a>
+        </div>
     </form>
-</div>
-
+@endsection
